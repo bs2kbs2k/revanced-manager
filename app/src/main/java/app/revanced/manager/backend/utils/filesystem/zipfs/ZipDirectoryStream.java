@@ -40,61 +40,61 @@ import java.util.NoSuchElementException;
  */
 class ZipDirectoryStream implements DirectoryStream<Path> {
 
-    private final ZipFileSystem zipfs;
-    private final ZipPath dir;
-    private final DirectoryStream.Filter<? super Path> filter;
-    private volatile boolean isClosed;
-    private volatile Iterator<Path> itr;
+	private final ZipFileSystem zipfs;
+	private final ZipPath dir;
+	private final DirectoryStream.Filter<? super Path> filter;
+	private volatile boolean isClosed;
+	private volatile Iterator<Path> itr;
 
-    ZipDirectoryStream(ZipPath dir,
-                       DirectoryStream.Filter<? super java.nio.file.Path> filter)
-        throws IOException
-    {
-        this.zipfs = dir.getFileSystem();
-        this.dir = dir;
-        this.filter = filter;
-        // sanity check
-        if (!zipfs.isDirectory(dir.getResolvedPath()))
-            throw new NotDirectoryException(dir.toString());
-    }
+	ZipDirectoryStream(ZipPath dir,
+					   DirectoryStream.Filter<? super java.nio.file.Path> filter)
+		throws IOException
+	{
+		this.zipfs = dir.getFileSystem();
+		this.dir = dir;
+		this.filter = filter;
+		// sanity check
+		if (!zipfs.isDirectory(dir.getResolvedPath()))
+			throw new NotDirectoryException(dir.toString());
+	}
 
-    @Override
-    public synchronized Iterator<Path> iterator() {
-        if (isClosed)
-            throw new ClosedDirectoryStreamException();
-        if (itr != null)
-            throw new IllegalStateException("Iterator has already been returned");
+	@Override
+	public synchronized Iterator<Path> iterator() {
+		if (isClosed)
+			throw new ClosedDirectoryStreamException();
+		if (itr != null)
+			throw new IllegalStateException("Iterator has already been returned");
 
-        try {
-            itr = zipfs.iteratorOf(dir, filter);
-        } catch (IOException e) {
-            throw new DirectoryIteratorException(e);
-        }
+		try {
+			itr = zipfs.iteratorOf(dir, filter);
+		} catch (IOException e) {
+			throw new DirectoryIteratorException(e);
+		}
 
-        return new Iterator<Path>() {
-            @Override
-            public boolean hasNext() {
-                if (isClosed)
-                    return false;
-                return itr.hasNext();
-            }
+		return new Iterator<Path>() {
+			@Override
+			public boolean hasNext() {
+				if (isClosed)
+					return false;
+				return itr.hasNext();
+			}
 
-            @Override
-            public synchronized Path next() {
-                if (isClosed)
-                    throw new NoSuchElementException();
-                return itr.next();
-            }
+			@Override
+			public synchronized Path next() {
+				if (isClosed)
+					throw new NoSuchElementException();
+				return itr.next();
+			}
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
 
-    @Override
-    public synchronized void close() throws IOException {
-        isClosed = true;
-    }
+	@Override
+	public synchronized void close() throws IOException {
+		isClosed = true;
+	}
 }

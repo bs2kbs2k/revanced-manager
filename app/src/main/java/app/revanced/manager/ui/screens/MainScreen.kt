@@ -25,73 +25,73 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
-    Scaffold(
-        topBar = {
-            when (navController.appCurrentDestinationAsState().value) {
-                AppSelectorScreenDestination -> {
-                    AppBar(
-                        title = { Text("Select an app...") },
-                        navigationIcon = {
-                            IconButton(onClick = { navController.navigateUp() }) {
-                                androidx.compose.material3.Icon(
-                                    imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = "Return"
-                                )
-                            }
-                        }
-                    )
-                }
-                PatchesSelectorScreenDestination -> {
-                    AppBar(
-                        title = { Text("Select patches...") },
-                        navigationIcon = {
-                            IconButton(onClick = { navController.navigateUp() }) {
-                                androidx.compose.material3.Icon(
-                                    imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = "Return"
-                                )
-                            }
-                        }
-                    )
-                }
-                else -> {
-                    val currentUriHandler = LocalUriHandler.current
+	val navController = rememberNavController()
+	Scaffold(
+		topBar = {
+			when (navController.appCurrentDestinationAsState().value) {
+				AppSelectorScreenDestination -> {
+					AppBar(
+						title = { Text("Select an app...") },
+						navigationIcon = {
+							IconButton(onClick = { navController.navigateUp() }) {
+								androidx.compose.material3.Icon(
+									imageVector = Icons.Default.ArrowBack,
+									contentDescription = "Return"
+								)
+							}
+						}
+					)
+				}
+				PatchesSelectorScreenDestination -> {
+					AppBar(
+						title = { Text("Select patches...") },
+						navigationIcon = {
+							IconButton(onClick = { navController.navigateUp() }) {
+								androidx.compose.material3.Icon(
+									imageVector = Icons.Default.ArrowBack,
+									contentDescription = "Return"
+								)
+							}
+						}
+					)
+				}
+				else -> {
+					val currentUriHandler = LocalUriHandler.current
 
-                    AppBar(
-                        title = { Text("ReVanced Manager") },
-                        actions = {
-                            IconButton(onClick = { openDiscord(currentUriHandler) }) {
-                                Icon(
-                                    resourceId = R.drawable.ic_discord_24,
-                                    contentDescription = "Discord"
-                                )
-                            }
-                            IconButton(onClick = { openGitHub(currentUriHandler) }) {
-                                Icon(
-                                    resourceId = R.drawable.ic_github_24,
-                                    contentDescription = "GitHub"
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-        },
-        bottomBar = {
-            // TODO: find a better way to handle such stuff
-            if (
-                navController.appCurrentDestinationAsState().value != AppSelectorScreenDestination
-                &&
-                navController.appCurrentDestinationAsState().value != PatchesSelectorScreenDestination
-            ) BottomNavBar(navController)
-        },
-        content = { innerPadding ->
-            DestinationsNavHost(
-                modifier = Modifier.padding(innerPadding),
-                navController = navController,
-                navGraph = NavGraphs.root,
-            )
-        }
-    )
+					AppBar(
+						title = { Text("ReVanced Manager") },
+						actions = {
+							IconButton(onClick = { openDiscord(currentUriHandler) }) {
+								Icon(
+									resourceId = R.drawable.ic_discord_24,
+									contentDescription = "Discord"
+								)
+							}
+							IconButton(onClick = { openGitHub(currentUriHandler) }) {
+								Icon(
+									resourceId = R.drawable.ic_github_24,
+									contentDescription = "GitHub"
+								)
+							}
+						}
+					)
+				}
+			}
+		},
+		bottomBar = {
+			// TODO: find a better way to handle such stuff
+			if (
+				navController.appCurrentDestinationAsState().value != AppSelectorScreenDestination
+				&&
+				navController.appCurrentDestinationAsState().value != PatchesSelectorScreenDestination
+			) BottomNavBar(navController)
+		},
+		content = { innerPadding ->
+			DestinationsNavHost(
+				modifier = Modifier.padding(innerPadding),
+				navController = navController,
+				navGraph = NavGraphs.root,
+			)
+		}
+	)
 }

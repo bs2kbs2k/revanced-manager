@@ -15,21 +15,21 @@ import app.revanced.manager.ui.components.placeholders.Icon
 
 @Composable
 fun AppBar(title: @Composable () -> Unit, actions: @Composable RowScope.() -> Unit = {}, navigationIcon: @Composable () -> Unit = {}) {
-    SmallTopAppBar(
-        title = title,
-        navigationIcon = navigationIcon,
-        actions = actions
-    )
+	SmallTopAppBar(
+		title = title,
+		navigationIcon = navigationIcon,
+		actions = actions
+	)
 }
 
 @Preview(name = "Top App Bar Preview")
 @Composable
 fun AppBarPreview() {
-    AppBar(
-        title = { Text("ReVanced Manager") },
-        actions = {
-            Icon(resourceId = R.drawable.ic_discord_24, contentDescription = "Discord")
-            Icon(resourceId = R.drawable.ic_github_24, contentDescription = "GitHub")
-        }
-    )
+	AppBar(
+		title = { Text("ReVanced Manager") },
+		actions = {
+			Icon(resourceId = R.drawable.ic_discord_24, contentDescription = "Discord")
+			Icon(resourceId = R.drawable.ic_github_24, contentDescription = "GitHub")
+		}
+	)
 }

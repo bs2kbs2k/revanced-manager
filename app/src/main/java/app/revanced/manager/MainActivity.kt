@@ -16,35 +16,35 @@ import app.revanced.manager.ui.theme.ReVancedManagerTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            ReVancedManagerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val systemUiController = rememberSystemUiController()
-                    val useDarkIcons = !isSystemInDarkTheme()
-                    val background = MaterialTheme.colorScheme.background
-                    SideEffect {
-                        systemUiController.setSystemBarsColor(
-                            color = background,
-                            darkIcons = useDarkIcons
-                        )
-                    }
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setContent {
+			ReVancedManagerTheme {
+				Surface(
+					modifier = Modifier.fillMaxSize(),
+					color = MaterialTheme.colorScheme.background
+				) {
+					val systemUiController = rememberSystemUiController()
+					val useDarkIcons = !isSystemInDarkTheme()
+					val background = MaterialTheme.colorScheme.background
+					SideEffect {
+						systemUiController.setSystemBarsColor(
+							color = background,
+							darkIcons = useDarkIcons
+						)
+					}
 
-                    MainScreen()
-                }
-            }
-        }
-    }
+					MainScreen()
+				}
+			}
+		}
+	}
 }
 
 @Preview
 @Composable
 fun FullPreview() {
-    ReVancedManagerTheme {
-        MainScreen()
-    }
+	ReVancedManagerTheme {
+		MainScreen()
+	}
 }

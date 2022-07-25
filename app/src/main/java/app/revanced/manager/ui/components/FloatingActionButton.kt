@@ -11,33 +11,33 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun FloatingActionButton(
-    text: @Composable () -> Unit,
-    icon: @Composable () -> Unit,
-    onClick: () -> Unit,
-    enabled: Boolean
+	text: @Composable () -> Unit,
+	icon: @Composable () -> Unit,
+	onClick: () -> Unit,
+	enabled: Boolean
 ) {
-    // TODO: set icon color:
-    // tint = if (enabled) LocalContentColor.current.copy(alpha = LocalContentAlpha.current) else else DarkGray
-    CompositionLocalProvider(
-        LocalRippleTheme provides if (enabled) {
-            LocalRippleTheme.current
-        } else NoRippleTheme
-    ) {
-        ExtendedFloatingActionButton(
-            text = text,
-            icon = icon,
-            onClick = {
-                if (enabled) onClick()
-            },
-            containerColor = if (enabled) MaterialTheme.colorScheme.primaryContainer else Color.Gray,
-        )
-    }
+	// TODO: set icon color:
+	// tint = if (enabled) LocalContentColor.current.copy(alpha = LocalContentAlpha.current) else else DarkGray
+	CompositionLocalProvider(
+		LocalRippleTheme provides if (enabled) {
+			LocalRippleTheme.current
+		} else NoRippleTheme
+	) {
+		ExtendedFloatingActionButton(
+			text = text,
+			icon = icon,
+			onClick = {
+				if (enabled) onClick()
+			},
+			containerColor = if (enabled) MaterialTheme.colorScheme.primaryContainer else Color.Gray,
+		)
+	}
 }
 
 private object NoRippleTheme : RippleTheme {
-    @Composable
-    override fun defaultColor() = Color.Unspecified
+	@Composable
+	override fun defaultColor() = Color.Unspecified
 
-    @Composable
-    override fun rippleAlpha(): RippleAlpha = RippleAlpha(0.0f, 0.0f, 0.0f, 0.0f)
+	@Composable
+	override fun rippleAlpha(): RippleAlpha = RippleAlpha(0.0f, 0.0f, 0.0f, 0.0f)
 }

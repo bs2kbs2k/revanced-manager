@@ -14,42 +14,42 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class DashboardViewModel : ViewModel() {
-    private val tag = "DashboardViewModel"
+	private val tag = "DashboardViewModel"
 
-    @Suppress("SpellCheckingInspection") // I'll save you the headache.
-    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+	@Suppress("SpellCheckingInspection") // I'll save you the headache.
+	val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
 
-    private var _latestPatcherCommit: GitHubAPI.Commits.Commit? by mutableStateOf(null)
-    val patcherCommitDate: String
-        get() = _latestPatcherCommit?.commitDate ?: "unknown"
+	private var _latestPatcherCommit: GitHubAPI.Commits.Commit? by mutableStateOf(null)
+	val patcherCommitDate: String
+		get() = _latestPatcherCommit?.commitDate ?: "unknown"
 
-    private var _latestManagerCommit: GitHubAPI.Commits.Commit? by mutableStateOf(null)
-    val managerCommitDate: String
-        get() = _latestManagerCommit?.commitDate ?: "unknown"
+	private var _latestManagerCommit: GitHubAPI.Commits.Commit? by mutableStateOf(null)
+	val managerCommitDate: String
+		get() = _latestManagerCommit?.commitDate ?: "unknown"
 
-    init {
-        fetchLastCommit()
-    }
+	init {
+		fetchLastCommit()
+	}
 
-    private fun fetchLastCommit() {
-        viewModelScope.launch {
-            try {
-                _latestPatcherCommit = GitHubAPI.Commits.latestCommit(Global.ghPatcher, "HEAD")
-            } catch (e: Exception) {
-                Log.e(tag, "failed to fetch latest patcher commit", e)
-            }
-           try {
-               _latestManagerCommit = GitHubAPI.Commits.latestCommit(Global.ghManager, "HEAD")
-           } catch (e: Exception) {
-               Log.e(tag, "failed to fetch latest manager commit", e)
-           }
-        }
-    }
+	private fun fetchLastCommit() {
+		viewModelScope.launch {
+			try {
+				_latestPatcherCommit = GitHubAPI.Commits.latestCommit(Global.ghPatcher, "HEAD")
+			} catch (e: Exception) {
+				Log.e(tag, "failed to fetch latest patcher commit", e)
+			}
+		   try {
+			   _latestManagerCommit = GitHubAPI.Commits.latestCommit(Global.ghManager, "HEAD")
+		   } catch (e: Exception) {
+			   Log.e(tag, "failed to fetch latest manager commit", e)
+		   }
+		}
+	}
 
-    private val GitHubAPI.Commits.Commit.commitDate: String
-        get() = DateUtils.getRelativeTimeSpanString(
-            formatter.parse(commitObj.committer.date)!!.time,
-            Calendar.getInstance().timeInMillis,
-            DateUtils.MINUTE_IN_MILLIS
-        ).toString()
+	private val GitHubAPI.Commits.Commit.commitDate: String
+		get() = DateUtils.getRelativeTimeSpanString(
+			formatter.parse(commitObj.committer.date)!!.time,
+			Calendar.getInstance().timeInMillis,
+			DateUtils.MINUTE_IN_MILLIS
+		).toString()
 }

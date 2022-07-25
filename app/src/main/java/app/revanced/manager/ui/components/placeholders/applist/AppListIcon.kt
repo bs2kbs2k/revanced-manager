@@ -10,9 +10,9 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 @Composable
 fun AppIcon(drawable: Drawable?, contentDescription: String?) {
-    Image(
-        rememberDrawablePainter(drawable),
-        contentDescription,
-        Modifier.size(48.dp)
-    )
+	Image(
+		rememberDrawablePainter(drawable),
+		contentDescription,
+		Modifier.size(48.dp)
+	)
 }

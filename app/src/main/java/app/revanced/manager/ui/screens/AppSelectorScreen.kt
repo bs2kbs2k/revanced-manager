@@ -34,68 +34,68 @@ private const val tag = "AppSelector"
 @RootNavGraph
 @Composable
 fun AppSelectorScreen(
-    navigator: NavController, // TODO: add back button
-    vm: AppSelectorViewModel = viewModel(),
-    pvm: PatcherViewModel = viewModel(LocalContext.current as ComponentActivity)
+	navigator: NavController, // TODO: add back button
+	vm: AppSelectorViewModel = viewModel(),
+	pvm: PatcherViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
-    val installedApps by vm.installedApps
+	val installedApps by vm.installedApps
 
-    when (val installedApps = installedApps) {
-        is Resource.Success -> {
-            val apps = installedApps.data
-            LazyColumn {
-                items(count = apps.size) {
-                    val app = apps[it]
-                    val label = vm.applicationLabel(app)
-                    val packageName = app.packageName
+	when (val installedApps = installedApps) {
+		is Resource.Success -> {
+			val apps = installedApps.data
+			LazyColumn {
+				items(count = apps.size) {
+					val app = apps[it]
+					val label = vm.applicationLabel(app)
+					val packageName = app.packageName
 
-                    val same = packageName == label
-                    ListItem(modifier = Modifier.clickable {
-                        pvm.setSelectedAppPackage(app.packageName)
-                        navigator.navigateUp()
-                    }, icon = {
-                        AppIcon(vm.loadIcon(app), packageName)
-                    }, text = {
-                        if (same) {
-                            Text(packageName)
-                        } else {
-                            Text(label)
-                        }
-                    }, secondaryText = {
-                        if (!same) {
-                            Text(packageName)
-                        }
-                    })
-                }
-            }
-        }
-        else -> {}
-    }
+					val same = packageName == label
+					ListItem(modifier = Modifier.clickable {
+						pvm.setSelectedAppPackage(app.packageName)
+						navigator.navigateUp()
+					}, icon = {
+						AppIcon(vm.loadIcon(app), packageName)
+					}, text = {
+						if (same) {
+							Text(packageName)
+						} else {
+							Text(label)
+						}
+					}, secondaryText = {
+						if (!same) {
+							Text(packageName)
+						}
+					})
+				}
+			}
+		}
+		else -> {}
+	}
 }
 
 class AppSelectorViewModel(val app: Application) : AndroidViewModel(app) {
-    val installedApps = mutableStateOf<Resource<List<ApplicationInfo>>>(Resource.Loading)
+	val installedApps = mutableStateOf<Resource<List<ApplicationInfo>>>(Resource.Loading)
 
-    init {
-        fetchInstalledApps()
-    }
+	init {
+		fetchInstalledApps()
+	}
 
-    @SuppressLint("QueryPermissionsNeeded")
-    private fun fetchInstalledApps() {
-        Log.d(tag, "Fetching applications")
-        try {
-            installedApps.value =
-                Resource.success(app.packageManager.getInstalledApplications(PackageManager.GET_META_DATA))
-        } catch (e: Exception) {
-            Log.e(tag, "An error occurred while fetching apps", e)
-        }
-    }
+	@SuppressLint("QueryPermissionsNeeded")
+	private fun fetchInstalledApps() {
+		Log.d(tag, "Fetching applications")
+		try {
+			installedApps.value =
+				Resource.success(app.packageManager.getInstalledApplications(PackageManager.GET_META_DATA))
+		} catch (e: Exception) {
+			Log.e(tag, "An error occurred while fetching apps", e)
+		}
+	}
 
-    fun applicationLabel(info: ApplicationInfo): String {
-        return app.packageManager.getApplicationLabel(info).toString()
-    }
+	fun applicationLabel(info: ApplicationInfo): String {
+		return app.packageManager.getApplicationLabel(info).toString()
+	}
 
-    fun loadIcon(info: ApplicationInfo): Drawable? {
-        return info.loadIcon(app.packageManager)
-    }
+	fun loadIcon(info: ApplicationInfo): Drawable? {
+		return info.loadIcon(app.packageManager)
+	}
 }

@@ -8,15 +8,15 @@ import androidx.compose.ui.res.painterResource
 
 @Composable
 fun Icon(
-    resourceId: Int,
-    contentDescription: String?,
-    modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current
+	resourceId: Int,
+	contentDescription: String?,
+	modifier: Modifier = Modifier,
+	tint: Color = LocalContentColor.current
 ) {
-    androidx.compose.material3.Icon(
-        painter = painterResource(id = resourceId),
-        contentDescription = contentDescription,
-        modifier = modifier,
-        tint = tint
-    )
+	androidx.compose.material3.Icon(
+		painter = painterResource(id = resourceId),
+		contentDescription = contentDescription,
+		modifier = modifier,
+		tint = tint
+	)
 }

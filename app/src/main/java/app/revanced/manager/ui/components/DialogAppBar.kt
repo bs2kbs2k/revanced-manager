@@ -11,21 +11,21 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun DialogAppBar(title: String, onClick: () -> Unit) {
-    SmallTopAppBar(
-        title = {Text(title) },
-        navigationIcon = {
-            IconButton(onClick = onClick) {
-                androidx.compose.material3.Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Return"
-                )
-            }
-        }
-    )
+	SmallTopAppBar(
+		title = {Text(title) },
+		navigationIcon = {
+			IconButton(onClick = onClick) {
+				androidx.compose.material3.Icon(
+					Icons.Default.ArrowBack,
+					contentDescription = "Return"
+				)
+			}
+		}
+	)
 }
 
 @Preview(name = "Top App Bar Preview")
 @Composable
 fun DialogAppBarPreview() {
-    //DialogAppBar("Select an app!")
+	//DialogAppBar("Select an app!")
 }

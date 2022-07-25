@@ -6,24 +6,24 @@ import androidx.activity.ComponentActivity
 import com.topjohnwu.superuser.Shell
 
 class ShellHeater : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
 
-        Shell.getShell {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-    }
+		Shell.getShell {
+			val intent = Intent(this, MainActivity::class.java)
+			startActivity(intent)
+			finish()
+		}
+	}
 
-    companion object {
-        init {
-            Shell.enableVerboseLogging = BuildConfig.DEBUG
-            Shell.setDefaultBuilder(
-                Shell.Builder.create()
-                    .setFlags(Shell.FLAG_REDIRECT_STDERR)
-                    .setTimeout(10)
-            )
-        }
-    }
+	companion object {
+		init {
+			Shell.enableVerboseLogging = BuildConfig.DEBUG
+			Shell.setDefaultBuilder(
+				Shell.Builder.create()
+					.setFlags(Shell.FLAG_REDIRECT_STDERR)
+					.setTimeout(10)
+			)
+		}
+	}
 }

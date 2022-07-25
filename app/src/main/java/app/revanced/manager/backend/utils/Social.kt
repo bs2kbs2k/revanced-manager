@@ -5,9 +5,9 @@ import app.revanced.manager.Global.Companion.discordUrl
 import app.revanced.manager.Global.Companion.githubUrl
 
 fun openDiscord(uriHandle: UriHandler) {
-    uriHandle.openUri(discordUrl)
+	uriHandle.openUri(discordUrl)
 }
 
 fun openGitHub(uriHandle: UriHandler) {
-    uriHandle.openUri(githubUrl)
+	uriHandle.openUri(githubUrl)
 }

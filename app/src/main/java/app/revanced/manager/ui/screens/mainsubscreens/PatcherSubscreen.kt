@@ -53,270 +53,270 @@ private const val tag = "PatcherScreen"
 @RootNavGraph
 @Composable
 fun PatcherSubscreen(
-    navigator: NavController,
-    vm: PatcherViewModel = viewModel(LocalContext.current as ComponentActivity)
+	navigator: NavController,
+	vm: PatcherViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
-    val selectedAppPackage by vm.selectedAppPackage
-    val hasAppSelected = selectedAppPackage.isPresent
+	val selectedAppPackage by vm.selectedAppPackage
+	val hasAppSelected = selectedAppPackage.isPresent
 
-    Scaffold(floatingActionButton = {
-        FloatingActionButton(
-            enabled = hasAppSelected && vm.anyPatchSelected(),
-            icon = { Icon(Icons.Default.Build, "sd") },
-            text = { Text("Patch") },
-            onClick = { vm.startPatcher() },
-        )
-    }) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            Card(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth(),
-                onClick = {
-                    navigator.navigate(
-                        AppSelectorScreenDestination().route
-                    )
-                }
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(id = R.string.card_application_header),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = selectedAppPackage.orElse(stringResource(R.string.card_application_body)),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(0.dp, 8.dp)
-                    )
-                }
-            }
-            Card(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth(),
-                enabled = hasAppSelected,
-                onClick = {
-                    navigator.navigate(PatchesSelectorScreenDestination().route)
-                }
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.card_patches_header),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = if (!hasAppSelected) {
-                            "Select an application first."
-                        } else if (vm.anyPatchSelected()) {
-                            "${vm.selectedAmount()} patches selected."
-                        } else {
-                            stringResource(R.string.card_patches_body_patches)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(0.dp, 8.dp)
-                    )
-                }
-            }
-        }
-    }
+	Scaffold(floatingActionButton = {
+		FloatingActionButton(
+			enabled = hasAppSelected && vm.anyPatchSelected(),
+			icon = { Icon(Icons.Default.Build, "sd") },
+			text = { Text("Patch") },
+			onClick = { vm.startPatcher() },
+		)
+	}) { paddingValues ->
+		Column(
+			modifier = Modifier
+				.padding(paddingValues)
+				.padding(16.dp)
+		) {
+			Card(
+				modifier = Modifier
+					.padding(4.dp)
+					.fillMaxWidth(),
+				onClick = {
+					navigator.navigate(
+						AppSelectorScreenDestination().route
+					)
+				}
+			) {
+				Column(modifier = Modifier.padding(16.dp)) {
+					Text(
+						text = stringResource(id = R.string.card_application_header),
+						style = MaterialTheme.typography.titleMedium
+					)
+					Text(
+						text = selectedAppPackage.orElse(stringResource(R.string.card_application_body)),
+						style = MaterialTheme.typography.bodyMedium,
+						modifier = Modifier.padding(0.dp, 8.dp)
+					)
+				}
+			}
+			Card(
+				modifier = Modifier
+					.padding(4.dp)
+					.fillMaxWidth(),
+				enabled = hasAppSelected,
+				onClick = {
+					navigator.navigate(PatchesSelectorScreenDestination().route)
+				}
+			) {
+				Column(modifier = Modifier.padding(16.dp)) {
+					Text(
+						text = stringResource(R.string.card_patches_header),
+						style = MaterialTheme.typography.titleMedium
+					)
+					Text(
+						text = if (!hasAppSelected) {
+							"Select an application first."
+						} else if (vm.anyPatchSelected()) {
+							"${vm.selectedAmount()} patches selected."
+						} else {
+							stringResource(R.string.card_patches_body_patches)
+						},
+						style = MaterialTheme.typography.bodyMedium,
+						modifier = Modifier.padding(0.dp, 8.dp)
+					)
+				}
+			}
+		}
+	}
 }
 
 data class PatchClass(
-    val patch: Class<out Patch<Data>>,
-    val unsupported: Boolean
+	val patch: Class<out Patch<Data>>,
+	val unsupported: Boolean
 )
 
 class PatcherViewModel(val app: Application) : AndroidViewModel(app) {
-    private val aaptPath = Aapt.binary(app).absolutePath
-    private val bundleCacheDir = app.filesDir.resolve("bundle-cache").also { it.mkdirs() }
-    private val frameworkPath = app.filesDir.resolve("framework").also { it.mkdirs() }.absolutePath
-    private val integrationsCacheDir = app.filesDir.resolve("integrations-cache").also { it.mkdirs() }
+	private val aaptPath = Aapt.binary(app).absolutePath
+	private val bundleCacheDir = app.filesDir.resolve("bundle-cache").also { it.mkdirs() }
+	private val frameworkPath = app.filesDir.resolve("framework").also { it.mkdirs() }.absolutePath
+	private val integrationsCacheDir = app.filesDir.resolve("integrations-cache").also { it.mkdirs() }
 
-    val selectedAppPackage = mutableStateOf(Optional.empty<String>())
-    private val selectedPatches = mutableStateListOf<String>()
-    val patches = mutableStateOf<Resource<List<Class<out Patch<Data>>>>>(Resource.Loading)
+	val selectedAppPackage = mutableStateOf(Optional.empty<String>())
+	private val selectedPatches = mutableStateListOf<String>()
+	val patches = mutableStateOf<Resource<List<Class<out Patch<Data>>>>>(Resource.Loading)
 
-    init {
-        loadPatches()
-    }
+	init {
+		loadPatches()
+	}
 
-    fun setSelectedAppPackage(appId: String) {
-        selectedAppPackage.value.ifPresent { s ->
-            if (s != appId) selectedPatches.clear()
-        }
-        selectedAppPackage.value = Optional.of(appId)
-    }
+	fun setSelectedAppPackage(appId: String) {
+		selectedAppPackage.value.ifPresent { s ->
+			if (s != appId) selectedPatches.clear()
+		}
+		selectedAppPackage.value = Optional.of(appId)
+	}
 
-    fun selectPatch(patchId: String, state: Boolean) {
-        if (state) selectedPatches.add(patchId)
-        else selectedPatches.remove(patchId)
-    }
+	fun selectPatch(patchId: String, state: Boolean) {
+		if (state) selectedPatches.add(patchId)
+		else selectedPatches.remove(patchId)
+	}
 
-    fun isPatchSelected(patchId: String): Boolean {
-        return selectedPatches.contains(patchId)
-    }
+	fun isPatchSelected(patchId: String): Boolean {
+		return selectedPatches.contains(patchId)
+	}
 
-    fun selectedAmount(): Int {
-        return selectedPatches.size
-    }
+	fun selectedAmount(): Int {
+		return selectedPatches.size
+	}
 
-    fun anyPatchSelected(): Boolean {
-        return !selectedPatches.isEmpty()
-    }
+	fun anyPatchSelected(): Boolean {
+		return !selectedPatches.isEmpty()
+	}
 
-    private fun findPatchesByIds(ids: Iterable<String>): List<Class<out Patch<Data>>> {
-        val (patches) = patches.value as? Resource.Success ?: return listOf()
-        return patches.filter { patch -> ids.any { it == patch.patchName } }
-    }
+	private fun findPatchesByIds(ids: Iterable<String>): List<Class<out Patch<Data>>> {
+		val (patches) = patches.value as? Resource.Success ?: return listOf()
+		return patches.filter { patch -> ids.any { it == patch.patchName } }
+	}
 
-    private fun getSelectedPackageInfo() =
-        if (selectedAppPackage.value.isPresent)
-            app.packageManager.getPackageInfo(
-                selectedAppPackage.value.get(),
-                PackageManager.GET_META_DATA
-            )
-        else null
+	private fun getSelectedPackageInfo() =
+		if (selectedAppPackage.value.isPresent)
+			app.packageManager.getPackageInfo(
+				selectedAppPackage.value.get(),
+				PackageManager.GET_META_DATA
+			)
+		else null
 
-    fun getFilteredPatches(): List<PatchClass> {
-        return buildList {
-            val selected = getSelectedPackageInfo() ?: return@buildList
-            val (patches) = patches.value as? Resource.Success ?: return@buildList
-            patches.forEach patch@{ patch ->
-                var unsupported = false
-                patch.compatiblePackages?.forEach { pkg ->
-                    // if we detect unsupported once, don't overwrite it
-                    if (pkg.name == selected.packageName && !unsupported) {
-                        unsupported = pkg.versions.isNotEmpty() && !pkg.versions.any { it == selected.versionName }
-                    }
-                }
-                add(PatchClass(patch, unsupported))
-            }
-        }
-    }
+	fun getFilteredPatches(): List<PatchClass> {
+		return buildList {
+			val selected = getSelectedPackageInfo() ?: return@buildList
+			val (patches) = patches.value as? Resource.Success ?: return@buildList
+			patches.forEach patch@{ patch ->
+				var unsupported = false
+				patch.compatiblePackages?.forEach { pkg ->
+					// if we detect unsupported once, don't overwrite it
+					if (pkg.name == selected.packageName && !unsupported) {
+						unsupported = pkg.versions.isNotEmpty() && !pkg.versions.any { it == selected.versionName }
+					}
+				}
+				add(PatchClass(patch, unsupported))
+			}
+		}
+	}
 
-    private suspend fun downloadDefaultPatchBundle(workdir: File): File {
-        return try {
-            val (_, out) = ManagerAPI.downloadPatches(workdir)
-            out
-        } catch (e: Exception) {
-            throw Exception("Failed to download default patch bundle", e)
-        }
-    }
+	private suspend fun downloadDefaultPatchBundle(workdir: File): File {
+		return try {
+			val (_, out) = ManagerAPI.downloadPatches(workdir)
+			out
+		} catch (e: Exception) {
+			throw Exception("Failed to download default patch bundle", e)
+		}
+	}
 
-    private suspend fun downloadIntegrations(workdir: File): File {
-        return try {
-            val (_, out) = ManagerAPI.downloadIntegrations(workdir)
-            out
-        } catch (e: Exception) {
-            throw Exception("Failed to download integrations", e)
-        }
-    }
+	private suspend fun downloadIntegrations(workdir: File): File {
+		return try {
+			val (_, out) = ManagerAPI.downloadIntegrations(workdir)
+			out
+		} catch (e: Exception) {
+			throw Exception("Failed to download integrations", e)
+		}
+	}
 
-    private fun loadPatches() = viewModelScope.launch {
-        try {
-            val file = downloadDefaultPatchBundle(bundleCacheDir)
-            loadPatches0(file.absolutePath)
-        } catch (e: Exception) {
-            Log.e(tag, "An error occurred while loading patches", e)
-        }
-    }
+	private fun loadPatches() = viewModelScope.launch {
+		try {
+			val file = downloadDefaultPatchBundle(bundleCacheDir)
+			loadPatches0(file.absolutePath)
+		} catch (e: Exception) {
+			Log.e(tag, "An error occurred while loading patches", e)
+		}
+	}
 
-    private fun loadPatches0(path: String) {
-        val patchClasses = DexPatchBundle(
-            path, DexClassLoader(
-                path,
-                app.codeCacheDir.absolutePath,
-                null,
-                javaClass.classLoader
-            )
-        ).loadPatches()
-        patches.value = Resource.Success(patchClasses)
-    }
+	private fun loadPatches0(path: String) {
+		val patchClasses = DexPatchBundle(
+			path, DexClassLoader(
+				path,
+				app.codeCacheDir.absolutePath,
+				null,
+				javaClass.classLoader
+			)
+		).loadPatches()
+		patches.value = Resource.Success(patchClasses)
+	}
 
-    private fun createWorkDir(): File {
-        return app.filesDir.resolve("tmp-${System.currentTimeMillis()}").also { it.mkdirs() }
-    }
+	private fun createWorkDir(): File {
+		return app.filesDir.resolve("tmp-${System.currentTimeMillis()}").also { it.mkdirs() }
+	}
 
-    fun startPatcher() {
-        val tag = "Patcher"
+	fun startPatcher() {
+		val tag = "Patcher"
 
-        viewModelScope.launch {
-            Log.d(tag, "Checking prerequisites")
-            val info = getSelectedPackageInfo()?.applicationInfo ?: return@launch
-            val patches = findPatchesByIds(selectedPatches)
-            if (patches.isEmpty()) return@launch
-            val integrations = downloadIntegrations(integrationsCacheDir)
+		viewModelScope.launch {
+			Log.d(tag, "Checking prerequisites")
+			val info = getSelectedPackageInfo()?.applicationInfo ?: return@launch
+			val patches = findPatchesByIds(selectedPatches)
+			if (patches.isEmpty()) return@launch
+			val integrations = downloadIntegrations(integrationsCacheDir)
 
-            Log.d(tag, "Creating directories")
-            val workdir = createWorkDir()
-            val inputFile = File(workdir.parentFile!!, "base.apk")
-            val patchedFile = File(workdir, "patched.apk")
-            val alignedFile = File(workdir, "aligned.apk")
-            val outputFile = File(workdir, "out.apk")
-            val cacheDirectory = workdir.resolve("cache")
-            val buildDirectory = cacheDirectory.resolve("build")
+			Log.d(tag, "Creating directories")
+			val workdir = createWorkDir()
+			val inputFile = File(workdir.parentFile!!, "base.apk")
+			val patchedFile = File(workdir, "patched.apk")
+			val alignedFile = File(workdir, "aligned.apk")
+			val outputFile = File(workdir, "out.apk")
+			val cacheDirectory = workdir.resolve("cache")
+			val buildDirectory = cacheDirectory.resolve("build")
 
-            try {
-//                Log.d(tag, "Copying base.apk from ${info.packageName}")
-//                withContext(Dispatchers.IO) {
-//                    Files.copy(
-//                        File(info.publicSourceDir).toPath(),
-//                        inputFile.toPath(),
-//                        StandardCopyOption.REPLACE_EXISTING
-//                    )
-//                }
+			try {
+//				Log.d(tag, "Copying base.apk from ${info.packageName}")
+//				withContext(Dispatchers.IO) {
+//					Files.copy(
+//						File(info.publicSourceDir).toPath(),
+//						inputFile.toPath(),
+//						StandardCopyOption.REPLACE_EXISTING
+//					)
+//				}
 
-                Log.d(tag, "Creating patcher")
-                val patcher = Patcher(
-                    PatcherOptions(
-                        inputFile,
-                        cacheDirectory.absolutePath,
-                        patchResources = true,
-                        aaptPath = aaptPath,
-                        frameworkFolderLocation = frameworkPath
-                    )
-                )
+				Log.d(tag, "Creating patcher")
+				val patcher = Patcher(
+					PatcherOptions(
+						inputFile,
+						cacheDirectory.absolutePath,
+						patchResources = true,
+						aaptPath = aaptPath,
+						frameworkFolderLocation = frameworkPath
+					)
+				)
 
-                Log.d(tag, "Merging integrations")
-                patcher.addFiles(listOf(integrations)) {}
+				Log.d(tag, "Merging integrations")
+				patcher.addFiles(listOf(integrations)) {}
 
-                Log.d(tag, "Adding ${patches.size} patch(es)")
-                patcher.addPatches(patches)
+				Log.d(tag, "Adding ${patches.size} patch(es)")
+				patcher.addPatches(patches)
 
-                Log.d(tag, "Applying patches")
-                patcher.applyPatches().forEach { (patch, result) ->
-                    if (result.isSuccess) {
-                        Log.i(tag, "[success] $patch")
-                        return@forEach
-                    }
-                    Log.e(tag, "[error] $patch:", result.exceptionOrNull()!!)
-                }
+				Log.d(tag, "Applying patches")
+				patcher.applyPatches().forEach { (patch, result) ->
+					if (result.isSuccess) {
+						Log.i(tag, "[success] $patch")
+						return@forEach
+					}
+					Log.e(tag, "[error] $patch:", result.exceptionOrNull()!!)
+				}
 
-                Log.d(tag, "Saving file")
-                val result = patcher.save()
-                ZipFileSystemUtils(result.resourceFile!!, patchedFile).use { fs ->
-                    result.dexFiles.forEach { fs.write(it.name, it.dexFileInputStream.readBytes()) }
-                    fs.writeInput()
-                    fs.uncompress(*result.doNotCompress!!.toTypedArray())
-                }
+				Log.d(tag, "Saving file")
+				val result = patcher.save()
+				ZipFileSystemUtils(result.resourceFile!!, patchedFile).use { fs ->
+					result.dexFiles.forEach { fs.write(it.name, it.dexFileInputStream.readBytes()) }
+					fs.writeInput()
+					fs.uncompress(*result.doNotCompress!!.toTypedArray())
+				}
 
-                Log.d(tag, "Aligning apk")
-                ZipAligner.align(patchedFile, alignedFile)
-                Log.d(tag, "Signing apk")
-                Signer("ReVanced", "s3cur3p@ssw0rd").signApk(alignedFile, outputFile)
+				Log.d(tag, "Aligning apk")
+				ZipAligner.align(patchedFile, alignedFile)
+				Log.d(tag, "Signing apk")
+				Signer("ReVanced", "s3cur3p@ssw0rd").signApk(alignedFile, outputFile)
 
-                // TODO: install apk!
-                Log.d(tag, "Installing apk")
-            } catch (e: Exception) {
-                Log.e(tag, "Error while patching", e)
-            }
+				// TODO: install apk!
+				Log.d(tag, "Installing apk")
+			} catch (e: Exception) {
+				Log.e(tag, "Error while patching", e)
+			}
 
-            Log.d(tag, "Deleting workdir")
-            //workdir.deleteRecursively()
-        }
-    }
+			Log.d(tag, "Deleting workdir")
+			//workdir.deleteRecursively()
+		}
+	}
 }

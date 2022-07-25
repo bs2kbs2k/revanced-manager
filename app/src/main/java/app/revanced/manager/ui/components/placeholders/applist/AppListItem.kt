@@ -6,11 +6,11 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AppListItem() {
-    LazyColumn {}
+	LazyColumn {}
 }
 
 @Preview
 @Composable
 fun AppListPreview() {
-    AppListItem()
+	AppListItem()
 }

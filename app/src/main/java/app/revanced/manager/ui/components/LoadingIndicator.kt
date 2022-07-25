@@ -15,13 +15,13 @@ import app.revanced.manager.R
 
 @Composable
 fun LoadingIndicator(id: Int? = null) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(stringResource(R.string.loading_body))
-        if (id != null) Text(stringResource(id))
-        CircularProgressIndicator(modifier = Modifier.padding(vertical = 16.dp))
-    }
+	Column(
+		modifier = Modifier.fillMaxSize(),
+		verticalArrangement = Arrangement.Center,
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		Text(stringResource(R.string.loading_body))
+		if (id != null) Text(stringResource(id))
+		CircularProgressIndicator(modifier = Modifier.padding(vertical = 16.dp))
+	}
 }

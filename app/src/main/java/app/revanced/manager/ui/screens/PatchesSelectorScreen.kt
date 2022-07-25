@@ -36,107 +36,107 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 @RootNavGraph
 @Composable
 fun PatchesSelectorScreen(
-    navigator: NavController,
-    pvm: PatcherViewModel = viewModel(LocalContext.current as ComponentActivity)
+	navigator: NavController,
+	pvm: PatcherViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
-    val patches = rememberSaveable { pvm.getFilteredPatches() }
-    val patchesState by pvm.patches
+	val patches = rememberSaveable { pvm.getFilteredPatches() }
+	val patchesState by pvm.patches
 
-    when (patchesState) {
-        is Resource.Success -> {
-            Scaffold(floatingActionButton = {
-                if (pvm.anyPatchSelected()) {
-                    ExtendedFloatingActionButton(
-                        icon = { Icon(Icons.Default.Check, "Done") },
-                        text = { Text("Done") },
-                        onClick = { navigator.navigateUp() },
-                    )
-                }
-            }) { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                ) {
-                    LazyColumn {
-                        items(count = patches.size) {
-                            val patch = patches[it]
-                            val name = patch.patch.patchName
-                            PatchSelectable(patch, pvm.isPatchSelected(name)) {
-                                pvm.selectPatch(name, !pvm.isPatchSelected(name))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else -> LoadingIndicator(R.string.loading_fetching_patches)
-    }
+	when (patchesState) {
+		is Resource.Success -> {
+			Scaffold(floatingActionButton = {
+				if (pvm.anyPatchSelected()) {
+					ExtendedFloatingActionButton(
+						icon = { Icon(Icons.Default.Check, "Done") },
+						text = { Text("Done") },
+						onClick = { navigator.navigateUp() },
+					)
+				}
+			}) { paddingValues ->
+				Column(
+					modifier = Modifier
+						.padding(paddingValues)
+				) {
+					LazyColumn {
+						items(count = patches.size) {
+							val patch = patches[it]
+							val name = patch.patch.patchName
+							PatchSelectable(patch, pvm.isPatchSelected(name)) {
+								pvm.selectPatch(name, !pvm.isPatchSelected(name))
+							}
+						}
+					}
+				}
+			}
+		}
+		else -> LoadingIndicator(R.string.loading_fetching_patches)
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatchSelectable(patchClass: PatchClass, isSelected: Boolean, onSelected: () -> Unit) {
-    val patch = patchClass.patch
-    val name = patch.patchName
+	val patch = patchClass.patch
+	val name = patch.patchName
 
-    Card(
-        modifier = Modifier
-            .padding(16.dp, 4.dp),
-        onClick = { onSelected() }
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row {
-                Column(
-                    Modifier
-                        .weight(1f)
-                ) {
-                    Text(
-                        text = name.replace("-", " ").split(" ")
-                            .joinToString(" ") { it.replaceFirstChar(Char::uppercase) },
-                        color = Color.White,
-                        style = Typography.titleMedium
-                    )
-                }
+	Card(
+		modifier = Modifier
+			.padding(16.dp, 4.dp),
+		onClick = { onSelected() }
+	) {
+		Column(modifier = Modifier.padding(12.dp)) {
+			Row {
+				Column(
+					Modifier
+						.weight(1f)
+				) {
+					Text(
+						text = name.replace("-", " ").split(" ")
+							.joinToString(" ") { it.replaceFirstChar(Char::uppercase) },
+						color = Color.White,
+						style = Typography.titleMedium
+					)
+				}
 
-                if (patchClass.unsupported) {
-                    Column(Modifier.align(Alignment.CenterVertically)) {
-                        Text(
-                            text = "Unsupported!", // TODO: get some yellow warning icon here
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                            style = Typography.bodySmall,
-                        )
-                    }
-                }
+				if (patchClass.unsupported) {
+					Column(Modifier.align(Alignment.CenterVertically)) {
+						Text(
+							text = "Unsupported!", // TODO: get some yellow warning icon here
+							modifier = Modifier.padding(horizontal = 4.dp),
+							style = Typography.bodySmall,
+						)
+					}
+				}
 
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = patch.version ?: "unknown",
-                                style = Typography.bodySmall,
-                                modifier = Modifier
-                                    .absolutePadding(24.dp, 0.dp, 12.dp, 0.dp)
-                            )
-                        }
-                        CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
-                            Checkbox(
-                                checked = isSelected,
-                                onCheckedChange = { onSelected() }
-                            )
-                        }
-                    }
-                }
-            }
-            patch.description?.let { desc ->
-                Text(
-                    text = desc,
-                    style = Typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-        }
-    }
+				Column {
+					Row(
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Column {
+							Text(
+								text = patch.version ?: "unknown",
+								style = Typography.bodySmall,
+								modifier = Modifier
+									.absolutePadding(24.dp, 0.dp, 12.dp, 0.dp)
+							)
+						}
+						CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+							Checkbox(
+								checked = isSelected,
+								onCheckedChange = { onSelected() }
+							)
+						}
+					}
+				}
+			}
+			patch.description?.let { desc ->
+				Text(
+					text = desc,
+					style = Typography.bodyMedium,
+					modifier = Modifier.padding(vertical = 8.dp)
+				)
+			}
+		}
+	}
 }

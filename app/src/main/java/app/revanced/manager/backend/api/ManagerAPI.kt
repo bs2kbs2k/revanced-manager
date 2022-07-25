@@ -15,55 +15,55 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 val client = HttpClient(Android) {
-    BrowserUserAgent()
-    install(ContentNegotiation) {
-        json(Json {
-            encodeDefaults = true
-            isLenient = true
-            ignoreUnknownKeys = true
-        })
-    }
+	BrowserUserAgent()
+	install(ContentNegotiation) {
+		json(Json {
+			encodeDefaults = true
+			isLenient = true
+			ignoreUnknownKeys = true
+		})
+	}
 }
 
 object ManagerAPI {
-    private const val tag = "ManagerAPI"
+	private const val tag = "ManagerAPI"
 
-    suspend fun downloadPatches(workdir: File) = downloadAsset(workdir, findPatchesAsset())
-    suspend fun downloadIntegrations(workdir: File) = downloadAsset(workdir, findIntegrationsAsset())
+	suspend fun downloadPatches(workdir: File) = downloadAsset(workdir, findPatchesAsset())
+	suspend fun downloadIntegrations(workdir: File) = downloadAsset(workdir, findIntegrationsAsset())
 
-    private suspend fun findPatchesAsset() = findAsset(Global.ghPatches)
-    private suspend fun findIntegrationsAsset() = findAsset(Global.ghIntegrations)
+	private suspend fun findPatchesAsset() = findAsset(Global.ghPatches)
+	private suspend fun findIntegrationsAsset() = findAsset(Global.ghIntegrations)
 
-    private suspend fun findAsset(repo: String): PatchesAsset {
-        val release = GitHubAPI.Releases.latestRelease(repo)
-        val asset = release.assets.findAsset() ?: throw MissingAssetException()
-        return PatchesAsset(release, asset)
-    }
+	private suspend fun findAsset(repo: String): PatchesAsset {
+		val release = GitHubAPI.Releases.latestRelease(repo)
+		val asset = release.assets.findAsset() ?: throw MissingAssetException()
+		return PatchesAsset(release, asset)
+	}
 
-    private suspend fun downloadAsset(workdir: File, patchesAsset: PatchesAsset): Pair<PatchesAsset, File> {
-        val (release, asset) = patchesAsset
-        val out = workdir.resolve("${release.tagName}-${asset.name}")
-        if (out.exists()) {
-            Log.d(tag, "Skipping downloading asset ${asset.name} because it exists in cache!")
-            return patchesAsset to out
-        }
+	private suspend fun downloadAsset(workdir: File, patchesAsset: PatchesAsset): Pair<PatchesAsset, File> {
+		val (release, asset) = patchesAsset
+		val out = workdir.resolve("${release.tagName}-${asset.name}")
+		if (out.exists()) {
+			Log.d(tag, "Skipping downloading asset ${asset.name} because it exists in cache!")
+			return patchesAsset to out
+		}
 
-        Log.d(tag, "Downloading asset ${asset.name}")
-        client.get(asset.downloadUrl)
-            .bodyAsChannel()
-            .copyAndClose(out.writeChannel())
+		Log.d(tag, "Downloading asset ${asset.name}")
+		client.get(asset.downloadUrl)
+			.bodyAsChannel()
+			.copyAndClose(out.writeChannel())
 
-        return patchesAsset to out
-    }
+		return patchesAsset to out
+	}
 
-    data class PatchesAsset(
-        val release: GitHubAPI.Releases.Release,
-        val asset: GitHubAPI.Releases.ReleaseAsset
-    )
+	data class PatchesAsset(
+		val release: GitHubAPI.Releases.Release,
+		val asset: GitHubAPI.Releases.ReleaseAsset
+	)
 
-    private fun List<GitHubAPI.Releases.ReleaseAsset>.findAsset() = find { asset ->
-        (asset.name.contains(".apk") || asset.name.contains(".dex")) && !asset.name.contains("-sources") && !asset.name.contains("-javadoc")
-    }
+	private fun List<GitHubAPI.Releases.ReleaseAsset>.findAsset() = find { asset ->
+		(asset.name.contains(".apk") || asset.name.contains(".dex")) && !asset.name.contains("-sources") && !asset.name.contains("-javadoc")
+	}
 }
 
 class MissingAssetException : Exception()

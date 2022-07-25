@@ -41,100 +41,100 @@ import java.nio.file.attribute.PosixFileAttributeView;
  */
 class ZipFileStore extends FileStore {
 
-    private final ZipFileSystem zfs;
+	private final ZipFileSystem zfs;
 
-    ZipFileStore(ZipPath zpath) {
-        this.zfs = zpath.getFileSystem();
-    }
+	ZipFileStore(ZipPath zpath) {
+		this.zfs = zpath.getFileSystem();
+	}
 
-    @Override
-    public String name() {
-        return zfs.toString() + "/";
-    }
+	@Override
+	public String name() {
+		return zfs.toString() + "/";
+	}
 
-    @Override
-    public String type() {
-        return "zipfs";
-    }
+	@Override
+	public String type() {
+		return "zipfs";
+	}
 
-    @Override
-    public boolean isReadOnly() {
-        return zfs.isReadOnly();
-    }
+	@Override
+	public boolean isReadOnly() {
+		return zfs.isReadOnly();
+	}
 
-    @Override
-    public boolean supportsFileAttributeView(Class<? extends FileAttributeView> type) {
-        return (type == BasicFileAttributeView.class ||
-                type == ZipFileAttributeView.class ||
-                ((type == FileOwnerAttributeView.class ||
-                  type == PosixFileAttributeView.class) && zfs.supportPosix));
-    }
+	@Override
+	public boolean supportsFileAttributeView(Class<? extends FileAttributeView> type) {
+		return (type == BasicFileAttributeView.class ||
+				type == ZipFileAttributeView.class ||
+				((type == FileOwnerAttributeView.class ||
+				  type == PosixFileAttributeView.class) && zfs.supportPosix));
+	}
 
-    @Override
-    public boolean supportsFileAttributeView(String name) {
-        return "basic".equals(name) || "zip".equals(name) ||
-               (("owner".equals(name) || "posix".equals(name)) && zfs.supportPosix);
-    }
+	@Override
+	public boolean supportsFileAttributeView(String name) {
+		return "basic".equals(name) || "zip".equals(name) ||
+			   (("owner".equals(name) || "posix".equals(name)) && zfs.supportPosix);
+	}
 
-    @Override
-    public <V extends FileStoreAttributeView> V getFileStoreAttributeView(Class<V> type) {
-        if (type == null)
-            throw new NullPointerException();
-        return null;
-    }
+	@Override
+	public <V extends FileStoreAttributeView> V getFileStoreAttributeView(Class<V> type) {
+		if (type == null)
+			throw new NullPointerException();
+		return null;
+	}
 
-    @Override
-    public long getTotalSpace() throws IOException {
-         return new ZipFileStoreAttributes(this).totalSpace();
-    }
+	@Override
+	public long getTotalSpace() throws IOException {
+		 return new ZipFileStoreAttributes(this).totalSpace();
+	}
 
-    @Override
-    public long getUsableSpace() throws IOException {
-         return new ZipFileStoreAttributes(this).usableSpace();
-    }
+	@Override
+	public long getUsableSpace() throws IOException {
+		 return new ZipFileStoreAttributes(this).usableSpace();
+	}
 
-    @Override
-    public long getUnallocatedSpace() throws IOException {
-         return new ZipFileStoreAttributes(this).unallocatedSpace();
-    }
+	@Override
+	public long getUnallocatedSpace() throws IOException {
+		 return new ZipFileStoreAttributes(this).unallocatedSpace();
+	}
 
-    @Override
-    public Object getAttribute(String attribute) throws IOException {
-         if (attribute.equals("totalSpace"))
-               return getTotalSpace();
-         if (attribute.equals("usableSpace"))
-               return getUsableSpace();
-         if (attribute.equals("unallocatedSpace"))
-               return getUnallocatedSpace();
-         throw new UnsupportedOperationException("does not support the given attribute");
-    }
+	@Override
+	public Object getAttribute(String attribute) throws IOException {
+		 if (attribute.equals("totalSpace"))
+			   return getTotalSpace();
+		 if (attribute.equals("usableSpace"))
+			   return getUsableSpace();
+		 if (attribute.equals("unallocatedSpace"))
+			   return getUnallocatedSpace();
+		 throw new UnsupportedOperationException("does not support the given attribute");
+	}
 
-    private static class ZipFileStoreAttributes {
-        final FileStore fstore;
-        final long size;
+	private static class ZipFileStoreAttributes {
+		final FileStore fstore;
+		final long size;
 
-        ZipFileStoreAttributes(ZipFileStore fileStore)
-            throws IOException
-        {
-            Path path = FileSystems.getDefault().getPath(fileStore.name());
-            this.size = Files.size(path);
-            this.fstore = Files.getFileStore(path);
-        }
+		ZipFileStoreAttributes(ZipFileStore fileStore)
+			throws IOException
+		{
+			Path path = FileSystems.getDefault().getPath(fileStore.name());
+			this.size = Files.size(path);
+			this.fstore = Files.getFileStore(path);
+		}
 
-        long totalSpace() {
-            return size;
-        }
+		long totalSpace() {
+			return size;
+		}
 
-        long usableSpace() throws IOException {
-            if (!fstore.isReadOnly())
-                return fstore.getUsableSpace();
-            return 0;
-        }
+		long usableSpace() throws IOException {
+			if (!fstore.isReadOnly())
+				return fstore.getUsableSpace();
+			return 0;
+		}
 
-        long unallocatedSpace()  throws IOException {
-            if (!fstore.isReadOnly())
-                return fstore.getUnallocatedSpace();
-            return 0;
-        }
-    }
+		long unallocatedSpace()  throws IOException {
+			if (!fstore.isReadOnly())
+				return fstore.getUnallocatedSpace();
+			return 0;
+		}
+	}
 }

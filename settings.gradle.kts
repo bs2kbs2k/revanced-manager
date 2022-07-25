@@ -1,15 +1,15 @@
 pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-    }
+	repositories {
+		gradlePluginPortal()
+		google()
+		mavenCentral()
+	}
 }
 dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-    }
+	repositories {
+		google()
+		mavenCentral()
+	}
 }
 rootProject.name = "ReVanced Manager"
 include(":app")

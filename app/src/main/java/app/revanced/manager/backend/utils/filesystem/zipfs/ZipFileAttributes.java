@@ -36,10 +36,10 @@ import java.util.Set;
  * @author Xueming Shen, Rajendra Gutupalli, Jaya Hangal
  */
 interface ZipFileAttributes extends BasicFileAttributes {
-    long compressedSize();
-    long crc();
-    int method();
-    byte[] extra();
-    byte[] comment();
-    Optional<Set<PosixFilePermission>> storedPermissions();
+	long compressedSize();
+	long crc();
+	int method();
+	byte[] extra();
+	byte[] comment();
+	Optional<Set<PosixFilePermission>> storedPermissions();
 }
